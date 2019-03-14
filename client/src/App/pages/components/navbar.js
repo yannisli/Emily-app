@@ -22,18 +22,9 @@ class NavBar extends Component {
                 <Link to='/about' className={this.props.location.pathname.includes("/about") ? "navbar_button_active" : "navbar_button"}>About</Link>
                 {manage}
                
-                <div style={{
-                    width: '32px',
-                    height: '32px',
-                    'margin-top': '8px',
-                    'margin-bottom': '8px',
-                    'vertical-align': 'middle',
-                    'text-align': 'center',
-                    'float': 'right',
-                    'margin-right': '240px',
-                }}>
-                    <UserCard/>
-                </div>
+                
+                <UserCard/>
+                
             
             
             </div>

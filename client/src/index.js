@@ -37,7 +37,7 @@ key - <integer> Internal Key in the props.guilds array
 GUILD_CHANNELS - We have Channels data for the selected guild in Manage
 data - {
     key - <integer> Internal Key in the props.guilds array
-    channels - <object> Object representing the Channels for the Guild at props.guilds[key]
+    channels - <Array of Objects> Object representing the Channels for the Guild at props.guilds[key]
 }
 USERCARD_CLICK - Usercard was clicked, show
 
@@ -63,7 +63,9 @@ const reduxReducer = (oldState = initialState, action) => {
             newState.Redirecting = action.data;
             return newState;
         case "GUILD_CHANNELS":
-            
+            /*
+                
+            */
             let newGuild = Object.assign({}, newState.guilds[action.data.key], {Channels: action.data.channels});
             newState.guilds[action.data.key] = newGuild;
             newState.LoadingGuild = false;

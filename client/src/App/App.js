@@ -19,7 +19,10 @@ class App extends Component {
         <span id="ruler" className="ruler"></span>
         <Switch>
           <Route exact path='/' component={Home}/>
-          <Route path='/manage' component={Manage}/>
+          {/* If there is no username, we don't want to render Manage page if users were there before */}
+          {this.props.User.username &&
+            <Route path='/manage' component={Manage}/>
+          }
           <Route path='/about' component={About}/>
           <Redirect from="*" to="/"/>
         </Switch>
@@ -81,5 +84,5 @@ class App extends Component {
 // We do not use anything here, we just need the Dispatch function for Redux store.
 // We have to use withRouter as well, or else things won't get re-rendered when we use Link to and etc.
 export default withRouter(connect(state => {
-  return {};
+  return {User: state.user};
 })(App));

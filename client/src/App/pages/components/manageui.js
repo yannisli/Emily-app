@@ -25,6 +25,9 @@ class ManageUI extends Component {
             return (<Redirect to='/manage'/>);
         // Administrator credentials, administrators should have 0x00000008 set to their permission
         let auth = (guild.permissions & 0x00000008) === 0x00000008;
+
+
+        let weHaveChannelData = guild.Channels && guild.Channels.Channels;
         return (
         <div className="manageui">
           
@@ -37,16 +40,16 @@ class ManageUI extends Component {
                 <br></br>
                 <div style={{'margin-top': '24px'}}>
                     { /* Display the Guild Name & ID */ }
-                    <span style={{color: 'white', 'font-size': '24px'}}>{guild.name}</span><span>#{guild.id}</span>
+                    <span className="manageui_title">{guild.name}</span><span>#{guild.id}</span>
                     { /* This is so the error stuff looks centered... actually application won't use this kind of padded center display */ }
-                    {(this.props.Loading || this.props.Redirecting || !guild.Channels || !guild.Channels[0]) &&
+                    {(this.props.Loading || this.props.Redirecting || !weHaveChannelData) &&
                         <div style={{
                             'padding': '20%',
                             'margin': 'auto',
                             'text-align': 'center'
                         }}>
                             { /* Our data was all loaded but it looks like we're not in this guild */ }
-                            {(!this.props.Loading && !this.props.Redirecting && (!guild.Channels || !guild.Channels[0] || id !== guild.id)) &&
+                            {(!this.props.Loading && !this.props.Redirecting && (!weHaveChannelData || id !== guild.id)) &&
                                 <div>
                                     
                                     Hmmmm.......<br/>
@@ -116,12 +119,14 @@ class ManageUI extends Component {
                     {/* Once all the data is loaded and the application returns that we are in this guild 
                         We are in the guild when Channels is filled out with valid Channel entries (aka 0 index should be another object, not undefined/null)
                     */}
-                    {(!this.props.Loading && !this.props.Redirecting && (guild.Channels && guild.Channels[0] && id === guild.id)) &&
+                    {(!this.props.Loading && !this.props.Redirecting && (weHaveChannelData && id === guild.id)) &&
                         <div>
-                            Looks like we're in this guild, let's do something
-                            <div style={{
-                                'text-align': 'left'
-                            }}>
+                            <hr/>
+                            <br/>
+                            <span className="manageui_subtitle">
+                                Registered Messages
+                            </span>
+                            <div className="manageui_content">
                                 {JSON.stringify(guild.Channels)}
                             </div>
                         </div>

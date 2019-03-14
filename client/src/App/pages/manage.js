@@ -18,7 +18,7 @@ class Manage extends Component {
     
     render() {
        
-    
+        
         return (
             <div>
                 <NavBar/>
@@ -49,7 +49,9 @@ class Manage extends Component {
         );
     }
     
-
+    componentDidMount() {
+        document.title = "Emily | Manage";
+    }
 
     /*mapStateToProps(state) {
         return {

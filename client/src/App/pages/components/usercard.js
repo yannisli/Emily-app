@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 import { connect } from 'react-redux';
 
+let dev = true;
 class UserCard extends Component {
     constructor() {
         super();
@@ -31,26 +32,44 @@ class UserCard extends Component {
                 
             );*/
             return (
-                <div style={{position: 'relative'}}>
-                    <button onClick={this.showCard} className="usercard_button">
-                        <div style={circleStyle}></div>
-                    </button>
-                    {this.props.showCard && 
-                        <div id="dropdown" className="usercard_content">
-                            <div className="usercard_separator">
-                                <div>Logged in as:</div>
-                                <span>{this.props.user.username}</span><span style={{color: 'gray'}}>#{this.props.user.discriminator}</span>
+                <div style={{
+                    width: '32px',
+                    height: '32px',
+                    'margin-top': '8px',
+                    'margin-bottom': '8px',
+                    'vertical-align': 'middle',
+                    'text-align': 'center',
+                    'float': 'right',
+                    'margin-right': '240px',
+                }}>
+                    <div style={{position: 'relative'}}>
+                        <button onClick={this.showCard} className="usercard_button">
+                            <div style={circleStyle}></div>
+                        </button>
+                        {this.props.showCard && 
+                            <div id="dropdown" className="usercard_content">
+                                <div className="usercard_separator">
+                                    <div>Logged in as:</div>
+                                    <span>{this.props.user.username}</span><span style={{color: 'gray'}}>#{this.props.user.discriminator}</span>
+                                </div>
+                                <a className="usercard_logout" href="/api/discord/logout">
+                                    Log Out
+                                </a>
+                                
                             </div>
-                            <a className="usercard_logout" href="/api/discord/logout">
-                                Log Out
-                            </a>
-                            
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                    </div>
             );
         }
-        return <a href='/api/discord/login' className="navbar_button">Login</a>
+        return (<div style={{
+            'float': 'right',
+            'margin-right': '240px'
+        }}>
+            <a href={`${dev ? 'http://localhost:8080' : ''}/api/discord/login`} className="navbar_button">
+                Login
+            </a>
+        </div>);
        
     }
 

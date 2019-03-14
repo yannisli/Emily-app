@@ -282,4 +282,25 @@ h1, h2, h3 {
     height: calc(100vh - 48px);
     width: calc(100% + 222px);
     margin-top: 0px;
+    color: lightgray;
+    font-size: 16px;
+}
+
+.manageui_title {
+    color: white;
+    font-size: 40px;
+    font-weight: 300;
+}
+
+.manageui_subtitle {
+    color: white;
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.manageui_content {
+    color: lightgray;
+    font-size: 14px;
+    font-weight: 300;
+    text-align: left;
 }

@@ -9,7 +9,7 @@ const router = express.Router();
 
 const port = process.env.PORT || 8080;
 
-const redirect = encodeURIComponent(`${process.env.ROOT_URI}:${port}/api/discord/callback`);
+const redirect = encodeURIComponent(`${process.env.ROOT_URI}${port !== '80' ? `:${port}` : ""}/api/discord/callback`);
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -26,7 +26,6 @@ const authenticateUser = async (req, res) => {
         return false;
     const cookies = cookie.parse(req.headers.cookie);
 
-    console.log(cookies);
 
     if(!cookies || !cookies.access_token || !cookies.refresh_token) {
         console.log("Cookies not present");
@@ -34,7 +33,6 @@ const authenticateUser = async (req, res) => {
     }
     // Has cookies.. but are they still valid?
 
-    console.log("Cookies present");
     
     const credentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
     const response = await fetch (`https://discordapp.com/api/users/@me`,
@@ -72,7 +70,6 @@ const authenticateUser = async (req, res) => {
     else
     {
         if(response.ok) {
-            console.log("All okay");
             return {access_token: cookies.access_token, refresh_token: cookies.refresh_token};
         }
         else
@@ -91,8 +88,41 @@ const authenticateUser = async (req, res) => {
 // Login
 // If user is not authenticated, redirect them, otherwise do nothing
 router.get("/login", (req, res) => {
+    console.log("login");
     res.redirect(`https://discordapp.com/oauth2/authorize?client_id=${CLIENT_ID}&scope=${CLIENT_SCOPE}&response_type=code&redirect_uri=${redirect}`);
 });
+// Logout
+// Tell Discord to revoke the token we have
+// Redirect them back to base page, cleer cookies
+// TODO: Make this SPA friendly
+router.get("/logout", catchAsyncMiddleware(async (req, res) => {
+    // Authenticate first!
+    const tokens = await authenticateUser(req,res);
+    if(!tokens)
+        throw new Error("InvalidTokens");
+    
+    const response = await fetch(`https://discordapp.com/api/oauth2/token/revoke?token=${tokens.access_token}`,
+    {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
+
+    if(response.ok)
+    {
+        console.log("Revocation went okay");
+        res.clearCookie("access_token");
+        res.clearCookie("refresh_token");
+        res.redirect("/");
+    }
+    else
+    {
+        console.log("Revocation error", response.status);
+        res.status(response.status);
+    }
+    
+}));
 // Callback
 // Validate the callback, get the code, ask for the access_token, and save the access_token as httpOnly cookie to be used for later sessions of the user
 // TODO: Make it more secure than just cookies
@@ -109,7 +139,6 @@ router.get("/callback", catchAsyncMiddleware(async (req, res) => {
     });
     const json = await response.json();
     // Save Access_Token as a cookie
-    console.log(json);
     res.cookie("access_token", json.access_token, {httpOnly: true, maxAge: json.expires_in * 1000});
     res.cookie("refresh_token", json.refresh_token, {httpOnly: true, maxAge: json.expires_in * 1000 * 2});
     res.redirect(`/Manage`);
@@ -136,8 +165,6 @@ router.get("/user", catchAsyncMiddleware(async (req, res) => {
 
     const json = await response.json();
 
-    console.log(json);
-
     
     res.send(json);
 
@@ -157,10 +184,8 @@ router.get("/guilds", catchAsyncMiddleware(async (req, res) => {
             'Authorization': `Bearer ${tokens.access_token}`
         }
     });
-    console.log(response.status);
     const json = await response.json();
     
-    console.log(json);
 
     // Check if response code 401 then that means we need to refresh the token
 

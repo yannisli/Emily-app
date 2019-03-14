@@ -31,6 +31,10 @@ class Home extends Component {
         );
     }
 
+    componentDidMount() {
+        document.title = "Emily | Home";
+    }
+
 
 }
 

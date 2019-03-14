@@ -24,6 +24,10 @@ class About extends Component {
             </div>
         );
     }
+
+    componentDidMount() {
+        document.title = "Emily | About";
+    }
 }
 
 export default About;
