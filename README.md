@@ -4,6 +4,20 @@ It utilizes node-fetch for HTTP API requests.
 
 It also utilizes Discord's OAuth2 service to login and pull relevant information for the user (ex. missing bot from server)
 
+## PROJECT DEPEDENCIES
+react
+react-dom
+react-redux
+react-router-dom
+redux
+node-fetch
+btoa
+cookies
+express
+body-parser
+morgan
+path
+
 You will need to create a .env file that contains the following:
 
 ### PORT
