@@ -301,3 +301,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+client/build
+client/node_modules
+client/public
+.env
+client/README.md

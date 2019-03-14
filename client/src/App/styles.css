@@ -1,0 +1,285 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+
+html {
+  background: #26262B;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  color: white;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: #282B30;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+h1, h2, h3 {
+    font-family: 'Roboto';
+    font-weight: 300;
+    color: white;
+}
+
+
+
+.login_button {
+    text-decoration: none;
+    display: inline-block;
+    line-height: 35px;
+    padding: 0 21px;
+    background: #7289DA;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.login_button:hover {
+    background: #697ec4;
+}
+
+.navbar {
+    display: block;
+    background: #202225;
+    font-size: 24px;
+    color: white;
+    line-height: 8px;
+    height: 48px;
+    width: 100%;
+    font-family: 'Roboto';
+    font-weight: 300;
+    padding: none;
+    margin: none;
+}
+
+.navbar_button {
+    text-decoration: none;
+    display: inline-block;
+    background: #202225;
+    font-size: 16px;
+    color: white;
+    height: 48px;
+    border: none;
+    width: auto;
+    padding-left: 25px;
+    padding-right: 25px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 48px;
+}
+
+.navbar_button_active {
+    box-sizing: border-box;
+    text-decoration: none;
+    display: inline-block;
+    background: #202225;
+    font-size: 16px;
+    color: white;
+    height: 48px;
+    border: none;
+    width: auto;
+    padding-left: 25px;
+    padding-right: 25px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 48px;
+    border-bottom: 2px solid #7289DA;
+}
+
+.navbar_button_active:hover {
+    color: #33AAB3;
+}
+
+.navbar_button:hover {
+    color: #33AAB3;
+}
+
+
+.usercard_content {
+    position: absolute;
+    right: -16px;
+    display: inline-block;
+    background-color: #18191C;
+    min-width: 384px;
+    max-width: 384px;
+    min-height: 64px;
+    max-height: 64px;
+    border-radius: 5px;
+    z-index: 1;
+   
+}
+
+
+
+
+
+
+.usercard_separator {
+    display: block;
+    float: left;
+    right: 0px;
+    
+    width: 288px;
+    height: 56px;
+    margin-left: 8px;
+    margin-top: 4px;
+    line-height: 20px;
+    font-size: 10px;
+    color: lightgray;
+    text-align: left;
+}
+
+.usercard_separator span {
+    display: inline-block;
+    margin-top: 0;
+    font-size: 14px;
+    font-family: 'Roboto';
+    font-weight: 400;
+    color: white;
+}
+
+.usercard_logout {
+    box-sizing: border-box;
+    display: block;
+    float: right;
+    width: 80px;
+    height: 28px;
+    margin-right: 8px;
+    margin-top: 18px;
+    font-weight: 300;
+    color: red;
+    font-size: 14px;
+    text-align: center;
+    line-height: 28px;
+}
+
+.usercard_logout:hover {
+    color: lightcoral;
+    border-bottom: thin solid lightcoral;
+}
+
+
+.usercard_button {
+    background-color: #202225;
+    border: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.page {
+    display: inline-block;
+    width: calc(100% - 256px - 224px);
+    margin-left: 256px;
+    vertical-align: top;
+
+    color: lightgray;
+}
+
+.page_left {
+    display: inline-block;
+    width: 256px;
+    margin: none;
+    padding: none;
+    
+    
+}
+.avatar {
+    display: 'inline-block';
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    line-height: 32px;
+    margin-top: 4px;
+    margin-left: 4px;
+    float: left;
+    font-size: 16;
+    text-align: center;
+    margin: none;
+    background-color: #282B30;
+    color: white;
+}
+
+.guild {
+    box-sizing: border-box;
+    display: 'inline-block';
+    background-color: #202225;
+    width: 240px;
+    height: 40px;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 40px;
+    margin: 2px;
+    padding: 0px;
+    vertical-align: middle;
+    color: gray;
+}
+
+.guild:hover {
+    color: white;
+    border-bottom: 2px solid #7289DA
+}
+
+.selected_guild {
+    display: 'inline-block';
+    background-color: #7289DA;
+    width: 240px;
+    height: 40px;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 40px;
+    margin: 2px;
+    padding: 0px;
+    vertical-align: middle;
+    color: white;
+}
+
+.selected_guild:hover {
+    background-color: #697ec4;
+}
+
+.selected_guild p {
+    display: 'inline-block';
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.selected_guild span {
+    margin-left: 4px;
+}
+
+.guild p {
+    display: 'inline-block';
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.guild span {
+    margin-left: 4px;
+}
+
+.ruler { 
+    visibility: hidden; 
+    white-space: nowrap;
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+
+.manageui {
+    background-color: #36393F;
+    height: calc(100vh - 48px);
+    width: calc(100% + 222px);
+    margin-top: 0px;
+}
