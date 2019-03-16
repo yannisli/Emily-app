@@ -5,7 +5,7 @@ import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 
-let devMode = true;
+let devMode = false;
 class ManageList extends Component {
     render() {
         // Array of elements to be returned

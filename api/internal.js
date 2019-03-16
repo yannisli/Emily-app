@@ -94,6 +94,11 @@ router.get("/exists/:id", catchAsyncMiddleware(async (req, res) =>
 
             for(let i = 0; i < json2.length; i++)
             {
+                // Check if this exists within our guild
+                // TODO: remove this, its because our restapi doesn't search via guild
+                // TODO: Redo on channel by channel basis, or just add guild to the schema
+                if(!channels[json2[i].channel])
+                    continue;
                 const msg = await fetch(`https://discordapp.com/api/channels/${json2[i].channel}/messages/${json2[i].message}`,
                 {
                     method: 'GET',

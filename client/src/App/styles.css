@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700');
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
-
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400');
 html {
   background: #26262B;
   font-family: 'Roboto', sans-serif;
@@ -43,6 +43,8 @@ h1, h2, h3 {
     color: white;
     font-weight: 400;
     font-size: 16px;
+    font-family: 'Roboto';
+    cursor: pointer;
 }
 
 .login_button:hover {
@@ -290,11 +292,12 @@ h1, h2, h3 {
     color: white;
     font-size: 40px;
     font-weight: 300;
+    font-family: 'Roboto Condensed'
 }
 
 .manageui_subtitle {
     color: white;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 300;
 }
 
@@ -304,3 +307,52 @@ h1, h2, h3 {
     font-weight: 300;
     text-align: left;
 }
+
+.manageui_content_message {
+    background-color: #202225;
+    color: white;
+    font-size: 16px;
+    font-weight: 300;
+    text-align: left;
+    min-width: 100%;
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    margin-top: 4px;
+    padding-top: 4px;
+    padding-left: 0px;
+    padding-bottom: 8px;
+    border-radius: 5px;
+}
+
+.manageui_content_message_right {
+    text-align: right;
+    float: right;
+    margin-right: 8px;
+    color: gray;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.manageui_content_message_author {
+    height: 40px;;
+    line-height: 40px;
+    margin-left: 4px;
+    color: lightgray;
+}
+.manageui_content_message_author_internal {
+    margin-left: 40px;
+    font-size: 16px;
+    
+    color: white;
+}
+
+.manageui_content_message_author_internal span {
+    color: gray;
+}
+.manageui_content_message_contents {
+    padding: 10px;
+    line-height: 100%;
+    font-size: 14px;
+}
+

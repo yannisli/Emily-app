@@ -26,8 +26,75 @@ class ManageUI extends Component {
         // Administrator credentials, administrators should have 0x00000008 set to their permission
         let auth = (guild.permissions & 0x00000008) === 0x00000008;
 
-
+        let canDisplayData = !this.props.Loading && !this.props.Redirecting;
         let weHaveChannelData = guild.Channels && guild.Channels.Channels;
+       
+
+        let contents = [];
+
+        if( canDisplayData && weHaveChannelData )
+        {
+            
+            for(let i = 0; i < guild.Channels.Messages.length; i++)
+            {
+
+                let content = guild.Channels.Messages[i].contents;
+                // We need to parse the contents into emoji if there are any
+                // They are denoted by <:wordidentifier:emoji>
+                console.log(content);
+          
+                let regex = content.match(/<:[A-Za-z0-9]*:[0-9]*>/g);
+                console.log("Results of regex:");
+                console.log(regex);
+
+                // We have to explode the content based on the results of the RegEx
+                // Substitute Emoji image in place of the regex text
+                
+                let element = (
+                    <div key={i} className="manageui_content_message">
+                        <div key={i} className="manageui_content_message_author">
+                            <div key={i} className="avatar" style={{'background': `url(https://cdn.discordapp.com/avatars/${guild.Channels.Messages[i].author.id}/${guild.Channels.Messages[i].author.avatar}.png?size=32)`}}/>
+                            <div key={`ui${i}`} className="manageui_content_message_author_internal">
+                                {guild.Channels.Messages[i].author.username}
+                                <span>
+                                    #{guild.Channels.Messages[i].author.discriminator}
+                                </span>
+                                <span> in </span>
+                                {guild.Channels.Channels[guild.Channels.Messages[i].channel]}
+                                <span>
+                                    #{guild.Channels.Messages[i].channel}
+                                </span>
+                                <span key={i} className="manageui_content_message_right">
+                                    {guild.Channels.Messages[i].id}
+                                </span>
+                            </div>
+                            
+                        </div>
+                        <div key={`contents${i}`} className="manageui_content_message_contents">
+                            
+                            {guild.Channels.Messages[i].contents}
+                        </div>
+                    </div>
+                );
+
+                contents.push(element);
+            }
+
+            if(contents.length === 0)
+            {
+                contents = (
+                    <div style={{
+                        'padding': '20%',
+                        'margin': 'auto',
+                        'text-align': 'center'
+                    }}>
+                        Looks like you don't have any messages registered at the moment...<br/>
+                        Click New Message to get started using reaction roles!
+                    </div>
+                );
+            }
+        }
+       
         return (
         <div className="manageui">
           
@@ -42,14 +109,14 @@ class ManageUI extends Component {
                     { /* Display the Guild Name & ID */ }
                     <span className="manageui_title">{guild.name}</span><span>#{guild.id}</span>
                     { /* This is so the error stuff looks centered... actually application won't use this kind of padded center display */ }
-                    {(this.props.Loading || this.props.Redirecting || !weHaveChannelData) &&
+                    {(!canDisplayData || !weHaveChannelData) &&
                         <div style={{
                             'padding': '20%',
                             'margin': 'auto',
                             'text-align': 'center'
                         }}>
                             { /* Our data was all loaded but it looks like we're not in this guild */ }
-                            {(!this.props.Loading && !this.props.Redirecting && (!weHaveChannelData || id !== guild.id)) &&
+                            {(canDisplayData && (!weHaveChannelData)) &&
                                 <div>
                                     
                                     Hmmmm.......<br/>
@@ -119,15 +186,22 @@ class ManageUI extends Component {
                     {/* Once all the data is loaded and the application returns that we are in this guild 
                         We are in the guild when Channels is filled out with valid Channel entries (aka 0 index should be another object, not undefined/null)
                     */}
-                    {(!this.props.Loading && !this.props.Redirecting && (weHaveChannelData && id === guild.id)) &&
+                    {(!this.props.Loading && !this.props.Redirecting && (weHaveChannelData)) &&
                         <div>
                             <hr/>
                             <br/>
                             <span className="manageui_subtitle">
                                 Registered Messages
                             </span>
+                            <span className="login_button" style={{
+                                'float': 'right',
+                                'margin-right': '0px'
+                            }}>
+                                New Message
+                            </span>
+                            <br/><br/>
                             <div className="manageui_content">
-                                {JSON.stringify(guild.Channels)}
+                                {contents}
                             </div>
                         </div>
                     }
