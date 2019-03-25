@@ -6,7 +6,16 @@ import { connect } from 'react-redux';
 
 
 let devMode = false;
+/**
+ * Component of Manage page.
+ * 
+ * Displays list of retrieved guilds
+ */
 class ManageList extends Component {
+    constructor(props)
+    {
+        super(props);
+    }
     render() {
         // Array of elements to be returned
         let guilds = [];
@@ -63,31 +72,7 @@ class ManageList extends Component {
                     <Link to={`/manage/${this.props.guilds[i].id}`} key={i} onClick={() => {
                         this.props.dispatch({type: "SELECT_GUILD", data: i});
                         // Fetch data
-                        fetch(`/api/internal/exists/${this.props.guilds[i].id}`, { method: 'GET'})
-                            .then(res => {
-                                if(!res.ok)
-                                {
-                                    
-                                    this.props.dispatch({type: "GUILD_CHANNELS", data: {key: i, channels: {}}});
-                                    
-                                    return;
-                                }
-                                res.json()
-                                    .then( json => {
-                                       
-                                        this.props.dispatch({type: "GUILD_CHANNELS", data: {key: i, channels: json}});
-                                   
-                                        
-                                    })
-                                    .catch( err => {
-                                        this.props.dispatch({type: "GUILD_CHANNELS", data: {key: i, channels: {}}});
-                                        console.log("Internal JSON Error", err);
-                                    });
-                            })
-                            .catch( err => {
-                                this.props.dispatch({type: "GUILD_CHANNELS", data: {key: i, channels: {}}});
-                                console.log("Internal Fetch Error", err);
-                            });
+                        this.props.fetchChannelData(i);
                     }}>
                         <div key={i} className={this.props.guilds[i].id === id ? "selected_guild" : "guild"}>
                             {icon}
@@ -106,13 +91,13 @@ class ManageList extends Component {
                 <div>
                     { /* We're loading, so display that we're loading */ }
                     {this.props.Loading &&
-                        <div style={{'text-align': 'center'}}>
+                        <div style={{'textAlign': 'center'}}>
                             Loading Guilds...
                         </div>
                     }
                     { /* This user is not in any guilds, so display that */ }
                     {!this.props.Loading &&
-                        <div style={{'text-align': 'center'}}>
+                        <div style={{'textAlign': 'center'}}>
                             You don't belong in any guilds...
                         </div>
                     }
@@ -131,6 +116,7 @@ class ManageList extends Component {
     componentDidMount() {
         this.props.dispatch({type: "MANAGE_LIST_LOADING", data: true});
     }
+    
 }
 
 export default withRouter(connect(state => {

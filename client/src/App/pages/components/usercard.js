@@ -19,7 +19,7 @@ class UserCard extends Component {
                 display: 'inline-block',
                 width: '32px',
                 height: '32px',
-                'border-radius': '50%',
+                'borderRadius': '50%',
                 background: `url(https://cdn.discordapp.com/avatars/${this.props.user.id}/${this.props.user.avatar}.png?size=32)`,
               
                 
@@ -35,12 +35,12 @@ class UserCard extends Component {
                 <div style={{
                     width: '32px',
                     height: '32px',
-                    'margin-top': '8px',
-                    'margin-bottom': '8px',
-                    'vertical-align': 'middle',
-                    'text-align': 'center',
+                    'marginTop': '8px',
+                    'marginBottom': '8px',
+                    'verticalAlign': 'middle',
+                    'textAlign': 'center',
                     'float': 'right',
-                    'margin-right': '240px',
+                    'marginRight': '240px',
                 }}>
                     <div style={{position: 'relative'}}>
                         <button onClick={this.showCard} className="usercard_button">
@@ -52,7 +52,7 @@ class UserCard extends Component {
                                     <div>Logged in as:</div>
                                     <span>{this.props.user.username}</span><span style={{color: 'gray'}}>#{this.props.user.discriminator}</span>
                                 </div>
-                                <a className="usercard_logout" href="/api/discord/logout">
+                                <a className="usercard_logout" href={`${dev ? 'http://localhost:8080' : ''}/api/discord/logout`}>
                                     Log Out
                                 </a>
                                 
@@ -64,7 +64,7 @@ class UserCard extends Component {
         }
         return (<div style={{
             'float': 'right',
-            'margin-right': '240px'
+            'marginRight': '240px'
         }}>
             <a href={`${dev ? 'http://localhost:8080' : ''}/api/discord/login`} className="navbar_button">
                 Login

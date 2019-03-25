@@ -16,7 +16,7 @@ class App extends Component {
   render() { 
     return (
       <div className="App">
-        <span id="ruler" className="ruler"></span>
+      
         <Switch>
           <Route exact path='/' component={Home}/>
           {/* If there is no username, we don't want to render Manage page if users were there before */}

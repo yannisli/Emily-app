@@ -46,36 +46,34 @@ router.get("/exists/:id", catchAsyncMiddleware(async (req, res) =>
     if(response.ok)
     {
         let json = await response.json();
-        console.log("Okay!");
-        console.log(json);
-        //res.status(200).json(json);
-
-        let resURI = `${internalURI}/api/getReactions`;
-        console.log(resURI);
-        const res2 = await fetch(`${resURI}`,
+        
+        const res2 = await fetch(`https://discordapp.com/api/guilds/${guildid}/roles`,
         {
             method: "GET",
+            headers: {
+                'User-Agent': 'Emily (https://github.com/yannisli, 1.0)',
+                'Authorization': `Bot ${process.env.BOT_TOKEN}`
+            }
         });
-
-        if(!res2.ok)
+        if(res2.ok)
         {
-            console.log("We did not get an OK response from our internal server");
-            res.status(res2.status).json({exists: false})
-        }
-        else
-        {
-            console.log("We got an OK response from internal server");
-            let json2 = await res2.json();
 
-            console.log(json2);
-             //res.status(200).json(json);
-            // json2 returns as an array of objects
+            let roles = await res2.json();
 
-            let discData = {};
-
-            // Now that we got all the stuff from Mongo, we need to retrieve the actual message contents, we already got channel names from json
-            // json returns as an array of objects
+            let data = {};
             
+            data.Roles = {};
+
+            for(let i = 0; i < roles.length; i++)
+            {
+                if(roles[i].managed)
+                    continue;
+                data.Roles[roles[i].id] = {
+                    color: roles[i].color,
+                    name: roles[i].name,
+                    permissions: roles[i].permissions
+                };
+            }
 
             let channels = {};
 
@@ -86,50 +84,87 @@ router.get("/exists/:id", catchAsyncMiddleware(async (req, res) =>
                 channels[json[i].id] = json[i].name;
             }
 
-            discData.Channels = channels;
+            data.Channels = channels;
 
-            // Pull messages now from Discord API...
-
-            discData.Messages = [];
-
-            for(let i = 0; i < json2.length; i++)
-            {
-                // Check if this exists within our guild
-                // TODO: remove this, its because our restapi doesn't search via guild
-                // TODO: Redo on channel by channel basis, or just add guild to the schema
-                if(!channels[json2[i].channel])
-                    continue;
-                const msg = await fetch(`https://discordapp.com/api/channels/${json2[i].channel}/messages/${json2[i].message}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': 'Emily (https://github.com/yannisli, 1.0)',
-                        'Authorization': `Bot ${process.env.BOT_TOKEN}`
-                    }
-                });
-
-                if(msg.ok)
-                {
-                    let msgJson = await msg.json();
-                    discData.Messages.push({
-                        contents: msgJson.content,
-                        author: msgJson.author,
-                        id: msgJson.id,
-                        channel: msgJson.channel_id
-                    });
-                }
-            }
-
-            console.log("Done fetching all data..");
-            console.log(discData);
-
-            res.status(200).json(discData);
+            res.status(200).json(data);
+        }
+        else
+        {
+            res.status(res2.status).json({exists: false, error: 'Failed at role fetch'});
         }
     }
     else
     {
         console.log("Not okay", response.status);
-        res.status(response.status).json({exists: false});
+        res.status(response.status).json({exists: false, error: 'Failed at guild fetch'});
+    }
+}));
+
+router.get("/messages/:id", catchAsyncMiddleware(async (req,res) => {
+    console.log(`/messages/${req.params.id}`);
+    const tokens = await authenticateUser(req, res);
+   
+    if(!tokens)
+        throw new Error("InvalidTokens");
+    let guildid = req.params.id;
+    let resURI = `${internalURI}/api/getReactions/${guildid}`;
+    console.log(resURI);
+    const response = await fetch(`${resURI}`,
+    {
+        method: "GET",
+    });
+
+    if(!response.ok)
+    {
+        console.log(`Error from internal server, response received: ${response.status}`);
+        res.status(500);
+    }
+    else
+    {
+        let json = await response.json();
+
+        let messages = [];
+
+        for(let i = 0; i < json.length; i++)
+        {
+            const msg = await fetch(`https://discordapp.com/api/channels/${json[i].channel}/messages/${json[i].message}`,
+            {
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Emily (https://github.com/yannisli, 1.0)',
+                    'Authorization': `Bot ${process.env.BOT_TOKEN}`
+                }
+            });
+            if(msg.ok)
+            {
+                
+                let msgJson = await msg.json();
+                let reacts = {};
+                if(msgJson.reactions && msgJson.reactions.length > 0) {
+                    for(let j = 0; j < msgJson.reactions.length; j++)
+                    {
+                        reacts[msgJson.reactions[j].emoji.id] = msgJson.reactions[j].count;
+                    }
+                }
+                console.log(msgJson.reactions);
+                messages.push({
+                    contents: msgJson.content,
+                    author: msgJson.author,
+                    id: msgJson.id,
+                    channel: msgJson.channel_id,
+                    reactions: json[i].reactions,
+                    discReactions: reacts
+                });
+            }
+            else
+            {
+                messages.push({
+                    error: `Failed to retrieve from Discord API for Message ID ${json[i].message}`
+                });
+            }
+        }
+
+        res.status(200).json(messages);
     }
 }));
 /**
@@ -173,6 +208,53 @@ router.get("/messages/:channel/:message", catchAsyncMiddleware(async (req, res) 
     let message = req.params.message;
 
     const response = await fetch(`https://discordapp.com/api/channels/${channel}/messages/${message}`,
+    {
+        method: "GET",
+        headers: {
+            'User-Agent': 'Emily (https://github.com/yannisli, 1.0)',
+            'Authorization': `Bot ${process.env.BOT_TOKEN}`
+        }
+    });
+
+    if(response.ok)
+    {
+        let json = await response.json();
+        const res2 = await fetch(`https://discordapp.com/api/channels/${channel}`,
+        {
+            method: "GET",
+            headers: {
+                'User-Agent': 'Emily (https://github.com/yannisli, 1.0)',
+                'Authorization': `Bot ${process.env.BOT_TOKEN}`
+            }
+        });
+        if(res2.ok)
+        {
+            let json2 = await res2.json();
+            console.log("Returned them with", json);
+            res.status(200).json(Object.assign({}, json, {channelName: json2.name}));
+        }
+        else
+        {
+            res.status(res2.status);
+        }
+        
+    }
+    else
+    {
+        res.status(response.status);
+    }
+}));
+
+router.get("/emojis/:id", catchAsyncMiddleware(async (req, res) =>
+{
+    const tokens = await authenticateUser(req, res);
+
+    if(!tokens)
+        throw new Error("InvalidTokens");
+    
+    let guild = req.params.id;
+
+    const response = await fetch(`https://discordapp.com/api/guilds/${guild}/emojis`,
     {
         method: "GET",
         headers: {

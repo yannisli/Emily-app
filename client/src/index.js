@@ -53,21 +53,79 @@ const reduxReducer = (oldState = initialState, action) => {
     console.log("Reduce", oldState, action);
     let newState = Object.assign({}, oldState);
     switch(action.type) {
+        case "NEW_REACTION_EMOJI_LOADING":
+            newState.LoadingEmoji = true;
+            return newState;
+        case "NEW_REACTION_EMOJI_DATA":
+            newState.EmojiList = action.data;
+            newState.LoadingEmoji = false;
+            return newState;
+        case "NEW_REACTION_EMOJI_CLICK":
+            newState.ShowEmojiDropdown = true;
+            return newState;
+        case "NEW_REACTION_EMOJI_CLICKOFF":
+            newState.ShowEmojiDropdown = false;
+            return newState;
+        case "NEW_REACTION_EMOJI_SELECT":
+            newState.ChosenEmoji = action.data;
+            return newState;
+        case "NEW_REACTION_ROLE_CLICK":
+            newState.ShowRoleDropdown = true;
+            return newState;
+        case "NEW_REACTION_ROLE_CLICKOFF":
+            newState.ShowRoleDropdown = false;
+            return newState;
+        case "NEW_REACTION_ROLE_SELECT":
+            newState.ChosenRole = action.data;
+            return newState;
+        case "NEW_REACTION_CLICK":
+            newState.CreatingReaction = true;
+            newState.CurrentMessage = action.data;
+            return newState;
+        case "NEW_REACTION_CLICKOFF":
+            newState.CreatingReaction = false;
+            newState.CurrentMessage = undefined;
+            // As Role and Emoji dropdown are tied to Creating Reaction, also set their state to false.
+            newState.ShowRoleDropdown = false;
+            newState.ShowEmojiDropdown = false;
+            return newState;
+        case "NEW_MESSAGE_PREVIEW_LOADING":
+            newState.MessagePreviewLoading = true;
+            return newState;
+        case "NEW_MESSAGE_PREVIEW":
+            newState.MessagePreviewLoading = false;
+            newState.PreviewMessage = action.data;
+            return newState;
+        case "NEW_MESSAGE_ALLOWBOT":
+            newState.BotAllow = action.data;
+            return newState;
+        case "NEW_MESSAGE_CLICK":
+            newState.CreatingMessage = true;
+            return newState;
+        case "NEW_MESSAGE_CLICKOFF":
+            newState.CreatingMessage = false;
+            return newState;
+        case "MANAGE_MESSAGES_LOADING":
+            newState.LoadingGuildMessages = action.data;
+            return newState;
         case "MANAGE_LIST_LOADING":
             newState.LoadingGuildList = action.data;
             return newState;
-        case "MANAGE_LOADING":
+        case "MANAGE_LOADING_CHANNEL":
             newState.LoadingGuild = action.data;
             return newState;
         case "BOT_REDIRECT":
             newState.Redirecting = action.data;
             return newState;
+        case "GUILD_MESSAGES":
+            newState.guilds[action.data.key] = Object.assign({}, newState.guilds[action.data.key], {Messages: action.data.messages});
+            newState.LoadingGuildMessages = false;
+            return newState;
         case "GUILD_CHANNELS":
             /*
                 
             */
-            let newGuild = Object.assign({}, newState.guilds[action.data.key], {Channels: action.data.channels});
-            newState.guilds[action.data.key] = newGuild;
+            newState.guilds[action.data.key] = Object.assign({}, newState.guilds[action.data.key], {Channels: action.data.res.Channels, Roles: action.data.res.Roles});
             newState.LoadingGuild = false;
             return newState;
         case "SELECT_GUILD":
