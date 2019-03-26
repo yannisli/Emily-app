@@ -7,6 +7,8 @@ require('dotenv').config();
 
 const app = express();
 
+
+
 const discordRouter = require("./api/discord").DiscordRouter;
 const internalRouter = require("./api/internal");
 
@@ -45,5 +47,6 @@ app.get("*", (req, res) => {
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
-    console.log(`Express.js now running on ${port}`);
+    console.log(`Server now running on ${port}`);
 });
+

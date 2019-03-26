@@ -88,7 +88,7 @@ const parseForEmoji = (parsetxt, key = 0) =>
             // Push emoji img, Discord displays emoji at 21x21, so we will replicate that here
             // The numerical ID will have a > appended to it, so we do a substr of 0 to length - 1 to retrieve only the Snowflake ID of the emoji to use for the cdn endpoint
             newContent.push((
-                <img key={`msg${key}regex(${j})img`}src={`https://cdn.discordapp.com/emojis/${id[2].substr(0, id[2].length-1)}.png`} style={{
+                <img alt="?" key={`msg${key}regex(${j})img`}src={`https://cdn.discordapp.com/emojis/${id[2].substr(0, id[2].length-1)}.png`} style={{
                         'width': '21px',
                         'height': '21px',
                         'display': 'inline-block',

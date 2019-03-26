@@ -12,10 +12,6 @@ let devMode = false;
  * Displays list of retrieved guilds
  */
 class ManageList extends Component {
-    constructor(props)
-    {
-        super(props);
-    }
     render() {
         // Array of elements to be returned
         let guilds = [];

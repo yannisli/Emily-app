@@ -1,6 +1,6 @@
 import React, { Component }  from 'react';
 
-import { withRouter, Redirect, Link } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 
 import { connect } from 'react-redux';
 
@@ -14,23 +14,11 @@ import Messages from './messages';
  * Also displays further module components such as 'Messages' when Guild information is validated and retrieved
  */
 class ManageUI extends Component {
-    constructor(props) {
-        super(props);
 
-       
-    }
-
-    
-    
     render()
     {
         
         let guild = this.props.Guild;
-        // To make sure we are not displaying data prematurely..
-        // TODO: Maybe since we have a loading flag already set, we don't need this anymore and it's wasted compute time
-        let id = this.props.location.pathname;
-        id = id.split("/");
-        id = id[id.length-1];
         // If we don't have this data from SELECT_GUILD, redirect to the root of Manage
         if(guild.name === undefined)
             return (<Redirect to='/manage'/>);
@@ -88,7 +76,7 @@ class ManageUI extends Component {
                                         this.props.dispatch({type: "MANAGE_LOADING_CHANNEL", data: true});
                                         this.props.dispatch({type: "BOT_REDIRECT", data: false});
                                         
-                                        {/* TODO: Put this and the ManageList one under a singular function call instead of 2 separate instances of the same thing */}
+                                        /* TODO: Put this and the ManageList one under a singular function call instead of 2 separate instances of the same thing */
                                         this.props.fetchChannelData(this.props.GuildKey);
 
                                     }

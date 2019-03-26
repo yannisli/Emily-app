@@ -26,6 +26,8 @@ class Messages extends Component {
         this.closeEmojiDrop = this.closeEmojiDrop.bind(this);
         this.refreshEmoji = this.refreshEmoji.bind(this);
         this.chooseEmoji = this.chooseEmoji.bind(this);
+        this.dispatchReactionCreate = this.dispatchReactionCreate.bind(this);
+        this.deleteReaction = this.deleteReaction.bind(this);
     }
     /**
      * Shows the reaction 'modal', it is currently an inline placeholder that looks like other registered ones, but has features to differentiate it as the creation UI
@@ -83,13 +85,12 @@ class Messages extends Component {
         if(this.props.LoadingEmoji)
             return;
         this.props.dispatch({type: "NEW_REACTION_EMOJI_LOADING"});
-        fetch(`/api/internal/emojis/${guild.id}`, { method: 'GET'})
+        fetch(`/api/internal/emojis/${guild}`, { method: 'GET'})
             .then(res => {
                 if(!res.ok)
-                {
-                    
+                {   
                     this.props.dispatch({type: "NEW_REACTION_EMOJI_DATA", data: null});
-                    console.log("interal server error for refresh emoji", res.status);
+                    console.log("internal server error for refresh emoji", res.status);
                     return;
                 }
                 res.json()
@@ -142,12 +143,59 @@ class Messages extends Component {
      */
     dispatchReactionCreate() {
         // Validate
+        console.log("dispatchReactionCreate");
         if (!this.props.ChosenEmoji || !this.props.ChosenRole)
             return;
+        console.log("valid objs");
         // Validate that its not just empty objects
+        console.log(this.props.ChosenEmoji, this.props.Guild.Roles, this.props.ChosenRole);
         if(!this.props.ChosenRole.id || !this.props.Guild.Roles[this.props.ChosenRole.id])
             return;
+        console.log("valid ids");
         // Send API request to API server and set flag to display modal awaiting results
+        let data = {};
+        data.role = this.props.ChosenRole.id;
+        data.emoji = this.props.ChosenEmoji;
+        data.guild_id = this.props.Guild.id;
+        data.message_id = this.props.CurrentMessage;
+        data.channel_id = this.props.CurrentMessageChannel;
+        
+        fetch(`/api/internal/reactions/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then( res => {
+            if(res.ok)
+            {
+                console.log("Result ok");
+            }
+            else
+            {
+                console.log("Create failed with", res.status);
+            }
+        }).catch(err => {
+            console.log("error", err);
+        });
+        // Now set our state that we are awaiting server results
+    }
+    deleteReaction(message, emoji) {
+        fetch(`/api/internal/reactions/${message}/${emoji}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if(res.ok)
+            {
+                console.log("Delete ok");
+            }
+            else
+            {
+                console.log("Delete fail", res.status);
+            }
+        }).catch(err => {
+            console.log("delete error", err);
+        });
+        // Now set our state that we are awaiting server results
     }
     render()
     {
@@ -205,7 +253,7 @@ class Messages extends Component {
                             // Push JSX elements that comprise the display for the Role
                             roles.push(
                                 <div key={`msg${i}rolecont${j}`} className="manageui_content_message_role" style={{borderLeft: `4px solid #${color}`}}>
-                                    <img key={`msg${i}emoji${j}`} src={`https://cdn.discordapp.com/emojis/${emojiid}.png`} style={{padding: '4px', display: 'inline-block', width: '28px', height: '28px', verticalAlign: 'middle'}}/>
+                                    <img alt="?" key={`msg${i}emoji${j}`} src={`https://cdn.discordapp.com/emojis/${emojiid}.png`} style={{padding: '4px', display: 'inline-block', width: '28px', height: '28px', verticalAlign: 'middle'}}/>
                                     <span key={`msg${i}role${j}`} style={{color: `#${color}`}}>
                                         {roleObj.name}
                                     </span>
@@ -220,7 +268,9 @@ class Messages extends Component {
                                         Edit Reaction
                                     </span>
 
-                                    <span key={`msg${i}roledelete${j}`} className="manageui_content_message_role_delete_button">
+                                    <span key={`msg${i}roledelete${j}`} className="manageui_content_message_role_delete_button" onClick={() => {
+                                        this.deleteReaction(guild.Messages[i].id, emojiid);
+                                    }}>
                                         Delete Reaction
                                     </span>
                                 </div>
@@ -258,8 +308,8 @@ class Messages extends Component {
                         {
                             emojiDrops.push((
                                 <img key={`emoji${key}`} onClick={() => {
-                                    this.chooseEmoji(this.props.EmojiList.Emojis[key]);
-                                }}src={`https://cdn.discordapp.com/emojis/${this.props.EmojiList.Emojis[key].id}.png`} className="emoji"/>
+                                    this.chooseEmoji(this.props.EmojiList.Emojis[key].id);
+                                }}src={`https://cdn.discordapp.com/emojis/${this.props.EmojiList.Emojis[key].id}.png`} alt="?" className="emoji"/>
                             ));
                         }
                     }
@@ -282,10 +332,7 @@ class Messages extends Component {
                             <div key={`actions${i}`} className="manageui_content_message_modify">
                                 <span className="login_button" style={{float: 'right'}} onClick={() => {
                                     // Which message are we adding reactions to? We need to send that so not every message will have the new reaction inline placeholder displayed
-                                    this.showReactionModal({
-                                        message: guild.Messages[i].id,
-                                        //channelName: guild.Channels[guild.Messages[i].channel]
-                                    });
+                                    this.showReactionModal({message: guild.Messages[i].id, channel: guild.Messages[i].channel});
                                 }}>
                                     Register New Reaction
                                 </span>                               
@@ -293,7 +340,7 @@ class Messages extends Component {
                                 {/* In-line Placeholder to display for when we are creating a new Reaction Role, mimics already registered ones */}
                                 <div key={`actionsbody${i}`} className="manageui_content_message_modify_body">
                                     {/* If we are creating a reaction then display */ }
-                                    {(this.props.CreatingReaction && this.props.CurrentMessage.id == guild.Messages[i].id) &&
+                                    {(this.props.CreatingReaction && this.props.CurrentMessage === guild.Messages[i].id) &&
                                         <div key={`createreact{i}`} className="reaction_placeholder" style={{
                                                 borderLeft: `4px solid #${chosenColor}`
                                             }}>
@@ -305,7 +352,7 @@ class Messages extends Component {
                                             }
                                             {/* Otherwise display the selected emoji image */ }
                                             {this.props.ChosenEmoji &&
-                                                <img onClick={() => {this.showEmojiDrop(guild.id)}} src={`https://cdn.discordapp.com/emojis/${this.props.ChosenEmoji}.png`} key={`createreactemoji${i}`} style={{cursor: 'pointer', textAlign: 'center', padding: '4px', display: 'inline-block', width: '28px', height: '28px', verticalAlign: 'middle'}}/>
+                                                <img alt="?" onClick={() => {this.showEmojiDrop(guild.id)}} src={`https://cdn.discordapp.com/emojis/${this.props.ChosenEmoji}.png`} key={`createreactemoji${i}`} style={{cursor: 'pointer', textAlign: 'center', padding: '4px', display: 'inline-block', width: '28px', height: '28px', verticalAlign: 'middle'}}/>
                                             }
                                             {/* Button that has the text of the selected role, or a default 'please select your role' */ }
                                             <span key={`createreactrolebut${i}`} className="reaction_modal_textbut" onClick={this.showRoleDrop} style={chosenColor !== "FFFFFF" ? {color: `#${chosenColor}`} : {}}>                                  
@@ -393,6 +440,7 @@ export default withRouter(connect(state => {
         CreatingMessage: state.CreatingMessage, // Are we creating a new message
         CreatingReaction: state.CreatingReaction, // Are we creating a new reaction
         CurrentMessage: state.CurrentMessage, // What message are we currently working on for new reaction
+        CurrentMessageChannel: state.CurrentMessageChannel, // What channel does the message belong to
         ChosenEmoji: state.ChosenEmoji, // What emoji did we choose
         EmojiList: state.EmojiList, // List of emojis for this guild
         ChosenRole: state.ChosenRole, // What role did we choose
@@ -400,6 +448,5 @@ export default withRouter(connect(state => {
         ShowEmojiDropdown: state.ShowEmojiDropdown, // Should we show the emoji dropdown
         LoadingEmoji: state.LoadingEmoji, // Are we loading emojis?
         SendingReaction: state.SendingReaction, // Are we sending a create reaction?
-        DisplayResult: state.DisplayResult, // Results to display
     }
 })(Messages));

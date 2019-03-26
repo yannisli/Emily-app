@@ -146,5 +146,9 @@ class Manage extends Component {
 }
 
 export default withRouter(connect(state => {
-    return {guilds: state.guilds};
+    return {
+        guilds: state.guilds,
+        AwaitingServer: state.AwaitingServer,
+        ServerResponse: state.ServerResponse, // Results to display
+    };
 })(Manage));

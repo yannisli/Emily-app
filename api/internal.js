@@ -71,7 +71,8 @@ router.get("/exists/:id", catchAsyncMiddleware(async (req, res) =>
                 data.Roles[roles[i].id] = {
                     color: roles[i].color,
                     name: roles[i].name,
-                    permissions: roles[i].permissions
+                    permissions: roles[i].permissions,
+                    id: roles[i].id
                 };
             }
 
@@ -107,7 +108,7 @@ router.get("/messages/:id", catchAsyncMiddleware(async (req,res) => {
     if(!tokens)
         throw new Error("InvalidTokens");
     let guildid = req.params.id;
-    let resURI = `${internalURI}/api/getReactions/${guildid}`;
+    let resURI = `${internalURI}/api/reactions/${guildid}`;
     console.log(resURI);
     const response = await fetch(`${resURI}`,
     {
@@ -197,7 +198,61 @@ router.get("/channels/:id", catchAsyncMiddleware(async (req, res) =>
     }
 }));
 */
+// Create new reaction for message in channel
+router.post("/reactions/create", catchAsyncMiddleware(async (req, res) =>
+{
+    const tokens = await authenticateUser(req, res);
 
+    if(!tokens)
+        throw new Error("InvalidTokens");
+
+    let body = req.body;
+
+    console.log("body", body);
+
+    if(!body || !body.emoji || !body.role || !body.guild_id || !body.channel_id || !body.message_id)
+    {
+        res.status(400);
+        return;
+    }
+    let p = `${internalURI}/api/reactions/create`;
+    // API request to backend
+    const response = await fetch(p,
+    {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if(response.ok)
+    {
+        res.status(200);
+    }
+    else
+        res.status(response.status);
+}));
+
+router.delete("/reactions/:message/:emoji", catchAsyncMiddleware(async (req, res) =>
+{
+    const tokens = await authenticateUser(req, res);
+    if(!tokens)
+        throw new Error("InvalidTokens");
+
+    let p = `${internalURI}/api/reactions/${req.params.message}/${req.params.emoji}`
+    const response = await fetch(p,
+    {
+        method: 'DELETE'
+    });
+
+    if(response.ok)
+    {
+        res.status(200);
+    }
+    else
+        res.status(response.status);
+}));
 router.get("/messages/:channel/:message", catchAsyncMiddleware(async (req, res) =>
 {
     const tokens = await authenticateUser(req, res);

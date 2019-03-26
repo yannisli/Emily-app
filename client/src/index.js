@@ -53,6 +53,13 @@ const reduxReducer = (oldState = initialState, action) => {
     console.log("Reduce", oldState, action);
     let newState = Object.assign({}, oldState);
     switch(action.type) {
+        case "AWAITING_SERVER_RESPONSE":
+            newState.AwaitingServer = true;
+            return newState;
+        case "SERVER_RESPONSE_RECEIVED":
+            newState.AwaitingServer = false;
+            newState.ServerResponse = action.data;
+            return newState;
         case "NEW_REACTION_EMOJI_LOADING":
             newState.LoadingEmoji = true;
             return newState;
@@ -80,7 +87,8 @@ const reduxReducer = (oldState = initialState, action) => {
             return newState;
         case "NEW_REACTION_CLICK":
             newState.CreatingReaction = true;
-            newState.CurrentMessage = action.data;
+            newState.CurrentMessage = action.data.message;
+            newState.CurrentMessageChannel = action.data.channel;
             return newState;
         case "NEW_REACTION_CLICKOFF":
             newState.CreatingReaction = false;
