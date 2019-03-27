@@ -109,7 +109,6 @@ class ManageUI extends Component {
      * Dispatch that we don't want to render redirecting, and that to render we are loading when we first load this component in case the states are set that way in the Store
      */
     componentDidMount() {
-        console.log("ManageUI: componentDidMount()");
         this.props.dispatch({type: "BOT_REDIRECT", data: false});
         this.props.dispatch({type: "MANAGE_LOADING_CHANNEL", data: true});
     }

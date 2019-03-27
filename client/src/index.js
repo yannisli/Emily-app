@@ -53,6 +53,91 @@ const reduxReducer = (oldState = initialState, action) => {
     console.log("Reduce", oldState, action);
     let newState = Object.assign({}, oldState);
     switch(action.type) {
+        case "REACTION_DELETE_CLICK": {
+            newState.DeletingReaction = true;
+            newState.ReactionToDelete = action.data;
+            return newState;
+        }
+        case "REACTION_DELETE_CLICKOFF": {
+            newState.DeletingReaction = false;
+            return newState;
+        }
+        case "MESSAGE_DELETE_CONFIRM": {
+            let newGuild = Object.assign({}, newState.guilds);
+            delete newGuild[action.data.key].Messages[action.data.messageKey];
+            newState.DeletingMessage = false;
+            newState.SelectedMessageToDelete = undefined;
+            newState.guilds = newGuild;
+            return newState;
+        }
+        case "MESSAGE_DELETE_CLICKOFF": {
+            newState.DeletingMessage = false;
+            newState.SelectedMessageToDelete = undefined;
+            return newState;
+        }
+        case "MESSAGE_DELETE_CLICK": {
+            newState.DeletingMessage = true;
+            newState.SelectedMessageToDelete = action.data;
+            return newState;
+        }
+        case "EDIT_REACTION_CONFIRM": {
+            // Confirm
+            let newGuild = Object.assign({}, newState.guilds);
+
+            newGuild[action.data.key].Messages[action.data.messageKey].reactions = action.data.reactions;
+            newState.EditingReaction = false;
+            newState.ReactionInEdit = undefined;
+            newState.guilds = newGuild;
+            return newState;
+        }
+        case "EDIT_REACTION_CLICKOFF":
+            newState.EditingReaction = false;
+            newState.ReactionInEdit = undefined;
+            newState.CurrentMessage = undefined;
+            newState.CurrentMessageChannel = undefined;
+            newState.CurrentMessageKey = undefined;
+            return newState;
+        case "EDIT_REACTION_CLICK":
+            // Do not allow creating reaction
+            newState.CreatingReaction = false;
+            newState.ShowEmojiDropdown = false;
+            newState.ShowRoleDropdown = false;
+            newState.ChosenEmoji = undefined;
+            newState.ChosenRole = undefined;
+            // 
+            newState.EditingReaction = true;
+            newState.ReactionInEdit = action.data.reaction;
+            newState.CurrentMessage = action.data.message;
+            newState.CurrentMessageKey = action.data.key;
+            //newState.CurrentMessageChannel = action.data.channel;
+            //newState.CurrentMessageKey = action.data.key;
+            return newState;
+        case "NEW_REACTION_DONE":
+            newState.ShowEmojiDropdown = false;
+            newState.ShowRoleDropdown = false;
+            newState.CreatingReaction = false;
+            delete newState.ChosenRole;
+            delete newState.ChosenEmoji;
+            return newState;
+        case "DELETE_MESSAGE_REACTION": {
+            let newGuild = Object.assign({}, newState.guilds);
+
+            let newArr = newGuild[action.data.key].Messages[action.data.messageKey].reactions.filter( r => r.emoji !== action.data.reaction);
+            newGuild[action.data.key].Messages[action.data.messageKey].reactions = newArr;
+
+            newState.DeletingReaction = false;
+            newState.ReactionToDelete = undefined;
+
+            newState.guilds = newGuild;
+            return newState;
+        }
+        case "UPSERT_MESSAGE_REACTION": {
+            let newGuild = Object.assign({}, newState.guilds);
+            newGuild[action.data.key].Messages[action.data.messageKey].reactions = action.data.reactions;
+
+            newState.guilds = newGuild;
+            return newState;
+        }
         case "AWAITING_SERVER_RESPONSE":
             newState.AwaitingServer = true;
             return newState;
@@ -86,9 +171,16 @@ const reduxReducer = (oldState = initialState, action) => {
             newState.ChosenRole = action.data;
             return newState;
         case "NEW_REACTION_CLICK":
+            // Can't edit at same time
+            newState.EditingReaction = false;
+            newState.ReactionInEdit = undefined;
+            //
             newState.CreatingReaction = true;
             newState.CurrentMessage = action.data.message;
             newState.CurrentMessageChannel = action.data.channel;
+            newState.CurrentMessageKey = action.data.key;
+            newState.ChosenEmoji = undefined;
+            newState.ChosenRole = undefined;
             return newState;
         case "NEW_REACTION_CLICKOFF":
             newState.CreatingReaction = false;
@@ -96,6 +188,8 @@ const reduxReducer = (oldState = initialState, action) => {
             // As Role and Emoji dropdown are tied to Creating Reaction, also set their state to false.
             newState.ShowRoleDropdown = false;
             newState.ShowEmojiDropdown = false;
+            newState.ChosenEmoji = undefined;
+            newState.ChosenRole = undefined;
             return newState;
         case "NEW_MESSAGE_PREVIEW_LOADING":
             newState.MessagePreviewLoading = true;

@@ -63,6 +63,7 @@ class Manage extends Component {
                     
                     </div>
                 </div>
+                { /* Awaiting Server Response Modal */ }
                 {/*<NewReactionModal/>*/}
                 {/*<NewMessageModal/>*/}
             </div>
@@ -84,7 +85,6 @@ class Manage extends Component {
      * @param {Number} key The index at which the Guild we're requesting the data resides in
      */
     fetchChannelData(key) {
-        console.log(`fetchChannelData(${key})`);
         fetch(`/api/internal/exists/${this.props.guilds[key].id}`, { method: 'GET'})
             .then(res => {
                 if(!res.ok)
@@ -116,7 +116,6 @@ class Manage extends Component {
      * @param {Number} key The index at which the Guild we're requesting the data for resides in
      */
     fetchMessageData(key) {
-        console.log(`fetchMessageData(${key})`);
         fetch(`/api/internal/messages/${this.props.guilds[key].id}`, { method: 'GET'})
             .then(res => {
                 if(!res.ok)

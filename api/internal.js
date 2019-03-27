@@ -11,8 +11,10 @@ const authenticateUser = require("./discord").AuthenticateUser;
 
 const router = express.Router();
 
-const internalURI = (`${process.env.API_URI}${process.env.API_PORT !== '80' ? `:${process.env.API_PORT}` : ""}`);
+let internalURI = (`${process.env.API_URI}${process.env.API_PORT !== '80' ? `:${process.env.API_PORT}` : ""}`);
 
+if(!internalURI.startsWith("http://"))
+    internalURI = "http://" + internalURI;
 console.log(internalURI);
 
 // Return if we're in this server or not
@@ -228,19 +230,52 @@ router.post("/reactions/create", catchAsyncMiddleware(async (req, res) =>
 
     if(response.ok)
     {
-        res.status(200);
+        let json = await(response.json());
+        res.status(200).json(json);
     }
     else
-        res.status(response.status);
+        res.status(response.status).send();
 }));
+// Update reaction for message
+router.put("/reactions/:message/:emoji", catchAsyncMiddleware(async (req, res) => {
+    console.log("update");
+    const tokens = await authenticateUser(req, res);
+    if(!tokens)
+        throw new Error("InvalidTokens");
+    if(!req.body || !req.body.newEmoji || !req.body.newRole || !req.body.currentRole) {
+        res.status(400).json({error: 'Invalid Payload'});
+        return;
+    }
+    console.log("passed auth!");
+    let body = req.body;
+    let p = `${internalURI}/api/reactions/${req.params.message}/${req.params.emoji}`;
+    const response = await fetch(p,
+    {
+        method: 'put',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
 
+    if(response.ok)
+    {
+        console.log("ok!");
+        let json = await response.json();
+
+        res.status(200).json(json);
+    }
+    else
+        res.status(response.status).send();
+}));
+// Delete reaction for message
 router.delete("/reactions/:message/:emoji", catchAsyncMiddleware(async (req, res) =>
 {
     const tokens = await authenticateUser(req, res);
     if(!tokens)
         throw new Error("InvalidTokens");
 
-    let p = `${internalURI}/api/reactions/${req.params.message}/${req.params.emoji}`
+    let p = `${internalURI}/api/reactions/${req.params.message}/${req.params.emoji}`;
     const response = await fetch(p,
     {
         method: 'DELETE'
@@ -248,11 +283,32 @@ router.delete("/reactions/:message/:emoji", catchAsyncMiddleware(async (req, res
 
     if(response.ok)
     {
-        res.status(200);
+        let json = await response.json();
+        res.status(200).json(json);
     }
     else
-        res.status(response.status);
+        res.status(response.status).send();
 }));
+// Delete message
+router.delete("/messages/:message", catchAsyncMiddleware(async (req, res) => {
+    const tokens = await authenticateUser(req, res);
+    if(!tokens)
+        throw new Error("InvalidTokens");
+    
+    let p = `${internalURI}/api/messages/${req.params.message}`;
+    const response = await fetch(p,
+    {
+        method: 'DELETE'
+    });
+
+    if(response.ok)
+    {
+        res.status(200).send();
+    }
+    else
+        res.status(response.status).send();
+}));
+// Get messages and channel info
 router.get("/messages/:channel/:message", catchAsyncMiddleware(async (req, res) =>
 {
     const tokens = await authenticateUser(req, res);
@@ -299,7 +355,7 @@ router.get("/messages/:channel/:message", catchAsyncMiddleware(async (req, res) 
         res.status(response.status);
     }
 }));
-
+// Get guild emojis for {id}
 router.get("/emojis/:id", catchAsyncMiddleware(async (req, res) =>
 {
     const tokens = await authenticateUser(req, res);

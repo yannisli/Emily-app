@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 import { connect } from 'react-redux';
 
-let dev = true;
+let dev = false;
 class UserCard extends Component {
     constructor() {
         super();

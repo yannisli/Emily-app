@@ -23,7 +23,7 @@ class ManageList extends Component {
         
         // If we have guilds.. lets loop through them and push them into the array
         if(this.props.guilds && this.props.guilds[0]) {
-            for(let i = 0; i < this.props.guilds.length; i++)
+            for(let i in this.props.guilds)
             {
                 // Permissions! Administrators must have 0x00000008
                 // We don't want to render any that we don't have admin permissions to.
