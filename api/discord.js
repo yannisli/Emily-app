@@ -100,12 +100,13 @@ router.get("/logout", catchAsyncMiddleware(async (req, res) => {
     const tokens = await authenticateUser(req,res);
     if(!tokens)
         throw new Error("InvalidTokens");
-    
+    const credentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
     const response = await fetch(`https://discordapp.com/api/oauth2/token/revoke?token=${tokens.access_token}`,
     {
         method: "POST",
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${credentials}`
         }
     });
 

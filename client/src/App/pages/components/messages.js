@@ -702,8 +702,15 @@ class Messages extends Component {
                     {this.props.CreatingMessage &&
     
                         <div className="manageui_content_message">
-                            Creating new message...            
+                            Creating new message...      
+                            {/* Bot Allow Checkbox */}      
+                            {/* Channel selection */ }
+                            {/* If bot allow, text box in the form of normal message body */ }
+                            {/* If not bot allow, text box for message id */ }
+                            {/* Confirm / Cancel */ }
                         </div>
+
+                        
                     }
                     {contents}
                 </div>

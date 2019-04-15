@@ -306,3 +306,5 @@ client/node_modules
 client/public
 .env
 client/README.md
+
+*.zip

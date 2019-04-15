@@ -10,10 +10,7 @@ class About extends Component {
                     <h1>About</h1>
                     <hr></hr>
                     <p>
-                    This project was started to demonstrate aptitude in JavaScript, HTML, CSS & the popular frameworks and libraries within the languages, namely ReactJS, Redux, Node.js,
-                        Express.js, and Mongoose and utilizing design paradigms such as RESTful API for stateless data loading. This bot is being created with the goal in mind to facilitate
-                        a better User Experience for some popular features of other Discord bots that are of a command-line interface by introducing a responsive web-application front-end
-                        as an alternative. Namely Reaction Role, and other bots that carry out administrative/utility tasks.
+                    This project was started as a hobby to demonstrate aptitude in Web Development. It was not intended to displace and takeover the market for current bots that provide similar features, however it aims to provide similar functionality to them.
                     </p>
                     <h1>Features</h1>
                     <hr></hr>

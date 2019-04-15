@@ -386,5 +386,28 @@ router.get("/emojis/:id", catchAsyncMiddleware(async (req, res) =>
     }
 }));
 
+// Get bot status
+router.get("/connected", catchAsyncMiddleware(async (req, res) => {
+    const tokens = await authenticateUser(req, res);
+
+    if(!tokens)
+        throw new Error("InvalidTokens");
+    
+    const response = await fetch(`${internalURI}/api/connected`,
+    {
+        method: 'GET'
+    });
+
+    if(response.ok)
+    {
+        let json = await response.json();
+        res.status(200).json(json);
+    }
+    else
+    {
+        res.status(200).json(false);
+    }
+}));
+
 
 module.exports = router;
